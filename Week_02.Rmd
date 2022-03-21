@@ -1,0 +1,722 @@
+---
+title: "Introduction to Exploratory Data Analysis"
+author: "Ryan Harrington"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Week 2 - Introduction to Exploratory Data Analysis
+
+We will use the Exploratory Data Analysis (EDA) framework as a way to begin working with R. A key component of EDA is visualizing data. Topics covered will include:
+
+-   Understanding packages and how to download, manage, and maintain them
+-   Understanding the Exploratory Data Analysis lifecycle
+-   Importing data into R from Excel files and .csvs
+-   Visualizing data using ggplot2
+-   Sharing code using git and Github
+
+# Exploratory Data Analysis lifecycle
+
+## Import
+
+## Tidy
+
+## Transform
+
+## Visualize
+
+## Model
+
+## Communicate
+
+# Framing of this week's analysis
+
+Need two datasets that needs relatively minor data transformation
+
+## Motivation
+
+### Highlight interesting ggplot2 examples
+
+## Review of datasets being used
+
+# Packages
+
+Last class we focused entirely on functions that are loaded natively with `R`. This set of functions (and many, many others) are part of "Base `R`". These are the functions and syntax that are native to the `R` language without any extensions or additions. You can do everything you want to by sticking with Base `R` syntax and functions, but many things are simply easier by using additional **packages**.
+
+Packages, or libraries, are code written by others that you are able to use in your own code. This is a hallmark of the open source nature of `R`.
+
+There are packages for nearly everything:
+
+-   Loading datasets
+-   Connecting to databases
+-   Manipulating data
+-   Implementing models
+-   Creating visualizations
+
+## Package repositories
+
+So...how do you actually make use of packages?
+
+First you have to start by knowing where packages come from. Packages are written by a wide variety of people - from everyday users of `R` to university professors introducing their work to the world to organizations contributing to the open source community for the good of the community.
+
+When you work with packages in `R`, they will come from two major places:
+
+-   the [Comprehensive R Archive Network](https://cran.r-project.org/) (CRAN)
+-   Github
+
+Most of the time you will work with packages that are hosted on CRAN. You may recognize this as the same place that you installed `R` from. In order for a package to live on CRAN, it must meet certain minimum requirements. You can read more about those [here](https://r-pkgs.org/release.html).
+
+Packages hosted on Github are either in development or do not meet the minimum requirements for CRAN. That is not necessarily a bad thing, but you should have a clear understanding of what you're doing before using a package hosted on Github.
+
+## Install / Load pattern
+
+Working with packages means *installing* and *loading* the packages.
+
+We first download and install a copy of the package from the source onto our computer. This only needs to happen once on your computer. After you've installed a package once, you don't need to do that again.
+
+Installing packages is simple enough to do:
+
+```{r}
+install.packages("tidyverse")
+```
+
+When installing packages you will see a very large number of messages updating you to the status of what is happening throughout the installation. Ultimately, you will see that the installation is complete when it tells you where on your location machine the package has been installed to.
+
+Now that you've installed your package, you have to tell your machine that you want to *use* it. Just because you have installed a package does not mean that it is always available on every script that you write. You have to explicitly tell your script that you want to use that package.
+
+You can keep a mental model of a library as you conceptualize this.
+
+In a library, there are thousands of books available for you to use. You don't access all of them at once, though. Rather, you check out a few books at a time for whatever your purpose at the moment is.
+
+Working with packages in `R` is the same. When you install a package, you're acting as a librarian adding a new book to your collection. The library is a special directory on your computer. If you want to use the knowledge in the book...or rather the functions in the package...then you need to check it out.
+
+In fact, the typical way that you will do all of this is with the `library` function.
+
+When you use the `library` function, you are telling `R` to *"load and attach add-on packages"* to the namespace. If we continue our library analogy, the namespace is basically a list of the books that we have checked out.
+
+Let's try this with our recently installed `tidyverse` package.
+
+```{r}
+library(tidyverse)
+```
+
+When we load in an `R` package we get a variety of messages telling us what is happening. It may not look exactly like this every time. In fact, the `tidyverse` load message is among the most stylized messages that you will see in your time using `R`.
+
+One thing you might have noticed is that there are actually *eight* different packages which have been loaded by calling `library(tidyverse)`. The tidyverse is not just a package, but rather a framework of several packages that work cohesively together. You'll also note that the title of our course is *Fundamentals of R with the tidyverse*. Needless to say, we'll be using this set of packages quite extensively throughout this course.
+
+The eight packages that were loaded are:
+
+-   `ggplot2` - the most popular graphing and visualization library in `R`
+-   `tibble` - an alternate type of dataframe
+-   `tidyr` - a library for reshaping data
+-   `readr` - a library for ingesting data
+-   `purrr` - a library for better working with lists
+-   `dplyr` - a library for data manipulation
+-   `stringr` - a library to improve working with strings
+-   `forcats` - a library for working with factors
+
+We will use all of these throughout the course. Each can be loaded in separately, but I often start my scripts by simply calling `library(tidyverse)`.
+
+Some other important things that you might notice are that there are version numbers across all of the packages - for example `ggplot2 3.3.3`. We're not going to concentrate on this now, but understanding which version of a package you are working with is very important.
+
+One last thing to highlight are the conflicts:
+
+`x dplyr::filter() masks stats::filter()`
+
+`x dplyr::lag()    masks stats::lag()`
+
+It shouldn't surprise you that sometimes packages include functions with the same name. In this case `dplyr` has a function called `filter` and so does the `stats` package (which is one of the default packages automatically loaded as part of Base `R`).
+
+The way that this is handled is that the most recently loaded package will "mask" the previously loaded package. This doesn't mean you can't access the function that has been masked, but rather it means that you have to be more specific when using it. This is something that causes all new `R` users trouble at some point.
+
+You'll notice the syntax that is used here:
+
+-   `dplyr::filter()`
+-   `stats::filter()`
+-   `dplyr::lag()`
+-   `stats::lag()`
+
+You can interpret this as `package::function()`. You can use the masked functions by using this syntax in your code. In fact, sometimes this is the best way to write your code.
+
+## Palmer Penguins
+
+Sometimes packages can be extremely simple. For example, they might just contain data. One example of this is the `palmerpenguins` package. In fact, we're going to utilize the data from this package throughout the class today.
+
+First, practice installing the package:
+
+```{r}
+install.packages("palmerpenguins")
+```
+
+Note the messages as it was downloaded. It is *much* less than when we installed the tidyverse packages. You can see:
+
+-   where the package was downloaded from:
+
+        trying URL 'https://cran.rstudio.com/bin/macosx/el-capitan/contrib/3.6/palmerpenguins_0.1.0.tgz'
+
+-   how large the package is:
+
+        Content type 'application/x-gzip' length 3001834 bytes (2.9 MB)
+        ==================================================
+        downloaded 2.9 MB
+
+-   and where it has been downloaded to:
+
+        The downloaded binary packages are in
+            /var/folders/3w/s_275r5517x08ywhgs6jrw_h0000gn/T//RtmpCc8bwk/downloaded_packages
+
+Next, let's load the package:
+
+```{r}
+library(palmerpenguins)
+```
+
+In this case, we get a brief warning telling us that the package was built under a different version of `R` from what we are using. This is good to know, but should not be an issue.
+
+In order to use this dataset, we need to use the `data` function to attach it to our environment.
+
+```{r}
+data("penguins")
+```
+
+You'll notice that after doing this there are two datasets loaded into your environment - `penguins` and `penguins_raw`. You can get a quick preview of your dataset by running the name of the object in your code chunk.
+
+```{r}
+penguins
+```
+
+# Basic dataframe exploration
+
+When I first begin working with a new dataset, I start with a consistent set of tools to explore the dataset. It's helpful to understand the shape of the dataset - the number of columns, the number of rows, the available columns, etc.
+
+## `Dataframe operators`
+
+### `str`
+
+A great way to do that is to observe the *structure* of the dataframe by utilizing the `str` function.
+
+```{r}
+str(penguins)
+```
+
+We can quickly see the basic information about the dataframe:
+
+-   `tibble[,8]` tells us that this object is of type `tibble` with 8 columns. Recall that a `tibble` is just an alternate type of dataframe. We'll talk more about the differences later.
+-   `[344 × 8]` tells us that the `penguins` object has 344 rows and 8 columns
+-   `(S3: tbl_df/tbl/data.frame)` tells us the various classes associated with the tibble
+
+Some of this information is above and beyond what we need to know in this course, but useful to know regardless.
+
+You'll also notice that each of the columns is listed for us:
+
+-   `species`
+-   `island`
+-   `bill_length_mm`
+-   `bill_depth_mm`
+-   `flipper_length_mm`
+-   `body_mass_g`
+-   `sex`
+-   `year`
+
+Each column includes the data type for that column. For example, `bill_depth_mm` is numeric. It also provides the first several values for that column.
+
+### `summary`
+
+Another excellent tool for data exploration is `summary`.
+
+```{r}
+summary(penguins)
+```
+
+The `summary` function provides a 5 number summary for numeric values and provides counts for other data types. You'll also notice that for all columns it provides counts for `NA`s. We haven't discussed `NA` values yet, but as you might guess, `NA` values are how `R` displays...nothing.
+
+### `$` operator
+
+One thing you may have noticed when we used `str` is that each column was preceded by the `$` symbol. This actually gives us a hint about one way to access the different columns of a dataframe.
+
+```{r}
+penguins$species
+penguins$island
+```
+
+### `[]`
+
+If we want to access specific rows or columns, we can do that by using the concept of brackets. Inside of brackets we can access the data by specifying the rows and columns that we are interested in:
+
+`dataframe[rows, columns]`
+
+```{r}
+# First column
+penguins[,1]
+
+# First row
+penguins[1,]
+
+# First ten rows,
+penguins[1:10,]
+
+# First row, first column
+penguins[1, 1]
+```
+
+We can, of course, combine this with other concepts to subset data in more interesting ways.
+
+```{r}
+# Which rows are we going to subset?
+penguins[seq(from = 2, to = 60, by = 2),]
+```
+
+### `nrow` / `ncol` / `dim`
+
+If we want to get the shape of of our data - how many rows and columns it has - there are a few utility functions that we can make use of. These can be really helpful to use when programming.
+
+```{r}
+# Number of rows
+nrow(penguins)
+
+# Number of columns
+ncol(penguins)
+
+# Rows by columns
+dim(penguins)
+```
+
+Here's a toy example of how we could use this. Pretend that we want to subset all even or all odd rows in our dataframe. We can do this easily by using `seq` and `nrow`.
+
+```{r}
+penguins[seq(from = 2, to = nrow(penguins), by = 2),]
+```
+
+### `unique`
+
+Another useful tool is the `unique` function. It does exactly what it sounds like it does - it returns the *unique* values in a list.
+
+```{r}
+unique(penguins)
+```
+
+Note that this returned the whole dataframe. At first, it doesn't seem very useful. The `penguins` dataframe typically has 344 rows and after passing it to `unique` there are still 344 rows. If we review the description of the function, you'll see why:
+
+> `unique` returns a vector, data frame or array like `x`but with duplicate elements/rows removed.
+
+So we did learn something - there are no rows in the `penguins` dataframe that are exactly the same.
+
+As the description mentions, we can also use this function on a vector:
+
+```{r}
+unique(penguins$species)
+```
+
+This also works with numeric values:
+
+```{r}
+unique(penguins$bill_depth_mm)
+```
+
+...though it's definitely less useful.
+
+### `length`
+
+The `length` function is also a helpful function that can be used to do more complex things. I often pair it with `unique`. For example
+
+```{r}
+length(unique(penguins$bill_depth_mm))
+```
+
+### `View`
+
+Finally, it can be helpful to see your data. The `View` function makes this easy.
+
+```{r}
+View(penguins)
+```
+
+# Graphing with `ggplot2`
+
+So far, we've covered a lot of the basics of `R`. These are all really useful things to know and they build the foundation for other work that we'll do.
+
+## Background of `ggplot2`
+
+FILL THIS IN FROM OTHER PRESENTATIONS THAT HAVE BEEN GIVEN BEFORE
+
+### Grammar of graphics
+
+### Hadley Wickham
+
+### Tidyverse
+
+## Basic components of a ggplot2
+
+There are three basic pieces that you have to consider when building a `ggplot2` graphic:
+
+-   data
+-   aesthetics
+-   geometries
+
+### data
+
+### mapping / aesthetics
+
+### geom\_
+
+### Layers concept
+
+### Syntax
+
+## Constructing a first ggplot2 graphic
+
+It's helpful to think about the questions that you want to answer as we construct our graphs. Recall the fields in our `penguins` dataframe.
+
+```{r}
+str(penguins)
+```
+
+One thing that I'm curious about is the relationship between `bill_length_mm` and some of the other continuous variables. Let's explore that.
+
+### `geom_point`
+
+We're going to start by comparing `bill_length_mm` to `bill_depth_mm`. Here's
+
+```{r}
+ggplot(data = penguins,
+       aes(x = bill_depth_mm,
+           y = bill_length_mm)) +
+  geom_point()
+```
+
+Let's break down what's happening here.
+
+We mentioned that a `ggplot2` object requires three things:
+
+-   data
+-   aesthetics
+-   geometries
+
+You can see each of these elements in the `ggplot2` object.
+
+-   data\
+    `data = penguins`
+-   aesthetics\
+    `aes(x = bill_depth_mm,    y = bill_length_mm)`
+-   geometries\
+    `geom_point()`
+
+All of these elements are required in each `ggplot2` object you create. There will be different data, different aesthetics, and different geometries, but those objects will always be there. Let's see what happens as we add those pieces in.
+
+We can start with the data:
+
+```{r}
+ggplot()
+```
+
+```{r}
+ggplot(data = penguins)
+```
+
+```{r}
+ggplot(data = penguins,
+       aes(x = bill_depth_mm))
+```
+
+```{r}
+ggplot(data = penguins,
+       aes(x = bill_depth_mm,
+           y = bill_length_mm))
+```
+
+```{r}
+ggplot(data = penguins,
+       aes(x = bill_depth_mm,
+           y = bill_length_mm)) +
+  geom_point()
+```
+
+### Geometries and Aesthetics
+
+In the `ggplot2` system, we are not limited to creating specific types of graphs. Instead, we layer different types of geometries on top of each other. You won't explicitly make a scatterplot, but rather, you will use `geom_point`. You won't explicitly make a bar chart, but rather you will use `geom_bar`.
+
+There are a lot of different geometries that you can choose from to use. You can get a quick preview of them by looking at the auto-complete options by typing `ggplot2::geom_` into your console.
+
+### Required vs. optional aesthetics
+
+If you've identified the geometry that you want to use, you then need to know which aesthetics go with it. Let's explore `geom_point` by looking at its vignette. Look all the way down at the **Aesthetics** section:
+
+> `geom_point()` understands the following aesthetics (required aesthetics are in bold):
+>
+> -   **`x`**
+>
+> -   **`y`**
+>
+> -   `alpha`
+>
+> -   `colour`
+>
+> -   `fill`
+>
+> -   `group`
+>
+> -   `shape`
+>
+> -   `size`
+>
+> -   `stroke`
+
+You'll notice that in our example, we utilized the `x` and `y` aesthetics. Those are the minimum required aesthetics for `geom_point`. Different geometries require different aesthetics.
+
+We can try another example. What is the relationship between bill length and flipper length?
+
+```{r}
+ggplot(data = penguins,
+       aes(x = flipper_length_mm,
+           y = bill_length_mm)) + 
+  geom_point()
+```
+
+### Mapping vs. setting aesthetics
+
+When we use aesthetics, we can either map values from our dataframe to them OR explicitly set them to a value.
+
+For example, let's explore the same relationship that we have previously - bill length to flipper length. Suppose that I am also curious to know how the different species of penguins relate to these values. I might try to add in an additional aesthetic for color to help differentiate the species from each other:
+
+```{r}
+ggplot(data = penguins,
+       aes(x = flipper_length_mm,
+           y = bill_length_mm,
+           color = species)) +
+  geom_point()
+```
+
+Notice that we included the `color = species` in `aes`, which tells `ggplot2` to map the colors to the `species` variables. The colors that you are seeing are the default values that `ggplot2` uses. Those can be changed easily, though we will not concentrate on that in this lesson.
+
+What if instead of mapping `species` to the `color` aesthetic we just wanted to change the color of all points to blue. We can easily handle this too.
+
+```{r}
+ggplot(data = penguins,
+       aes(x = flipper_length_mm,
+           y = bill_length_mm)) +
+  geom_point(color = "blue")
+```
+
+All that we have to do is move the `color` aesthetic outside of the `aes` argument. Anything inside of the `aes` argument will be mapped to the values provided to it. Anything outside of the `aes` argument should be contained inside of the `geom_` and will be explicitly defined.
+
+### Using multiple `geom_` 
+
+Let's go back to the question of the relationship between bill length and flipper length. It's great to see the relationship as points, but we might want to show a trend line as well. For this, we need an additional geometry.
+
+```{r}
+ggplot(data = penguins,
+       aes(x = flipper_length_mm,
+           y = bill_length_mm)) +
+  geom_point() +
+  geom_smooth()
+```
+
+Perhaps I'm curious about the different relationships that I might see across each of the species instead of seeing them in aggregate.
+
+```{r}
+ggplot(data = penguins,
+       aes(x = flipper_length_mm,
+           y = bill_length_mm,
+           color = species)) +
+  geom_point() +
+  geom_smooth()
+```
+
+### Statistical transformations
+
+One of the things that you'll notice about `geom_smooth` is that it introduced a new wrinkle to what `ggplot2` can do. In the example of `geom_point`, our data was presented as is. An x-coordinate and a y-coordinate joined forces to become a point on the graph. `geom_smooth` is different, though. We do not have a 1:1 mapping of the values to the geometry. Rather, the values have been transformed.
+
+Specifically, this introduces the concept of a "statistic" being an important piece of the `ggplot2` puzzle. Each geometry has a default statistic working behind the scenes of the function. Let's look back at `geom_point`'s vignette. Notice its arguments:
+
+    geom_point(
+      mapping = NULL,
+      data = NULL,
+      stat = "identity",
+      position = "identity",
+      ...,
+      na.rm = FALSE,
+      show.legend = NA,
+      inherit.aes = TRUE
+    )
+
+Specifically, it tells us that `stat = "identity"`.
+
+Now, check the vignette for \`geom_smooth. Notice its arguments:
+
+    geom_smooth(
+      mapping = NULL,
+      data = NULL,
+      stat = "smooth",
+      position = "identity",
+      ...,
+      method = NULL,
+      formula = NULL,
+      se = TRUE,
+      na.rm = FALSE,
+      orientation = NA,
+      show.legend = NA,
+      inherit.aes = TRUE
+    )
+
+Specifically, it tells us that `stat = "smooth"`.
+
+There are several other common geometries that utilize statistics other than "identity". For example...
+
+`geom_histogram` utilizes `stat = "bin"`
+
+```{r}
+ggplot(data = penguins,
+       aes(x = bill_length_mm)) +
+  geom_histogram()
+```
+
+`geom_bar` utilizes `stat = "count"`
+
+```{r}
+ggplot(data = penguins,
+       aes(x = island)) +
+  geom_bar()
+```
+
+### Facets
+
+One extremely powerful feature of `ggplot2` is the concept of faceting. The concept behind facets is that it allows us to make "small multiples" of our graphs. It gives us another way to explore relationships behind our data. Let's explore what that looks like:
+
+```{r}
+ggplot(data = penguins,
+       aes(x = flipper_length_mm,
+           y = bill_length_mm)) +
+  geom_point() +
+  facet_grid(island ~ species)
+```
+
+We can, of course, do all of the same things we did previously, but with facets involved.
+
+Like adding in `color`:
+
+```{r}
+ggplot(data = penguins,
+       aes(x = flipper_length_mm,
+           y = bill_length_mm,
+           color = species)) +
+  geom_point() +
+  facet_grid(island ~ species)
+```
+
+Or multiple geometries:
+
+```{r}
+ggplot(data = penguins,
+       aes(x = flipper_length_mm,
+           y = bill_length_mm,
+           color = species)) +
+  geom_point() +
+  geom_smooth() +
+  facet_grid(island ~ species)
+```
+
+I notice that when we build this graph it is extremely difficult to see the `geom_smooth` lines. Perhaps what I'd actually like to do is only map the color of the species to the points, but not to the lines of `geom_smooth`. I'd rather leave that as the default blue. We can easily do this as well.
+
+```{r}
+ggplot(data = penguins,
+       aes(x = flipper_length_mm,
+           y = bill_length_mm)) +
+  geom_point(aes(color = species)) +
+  geom_smooth() +
+  facet_grid(island ~ species)
+```
+
+Actually - I hate the blue. It really clashes with the other colors. Let's change it to black. Easy enough.
+
+```{r}
+ggplot(data = penguins,
+       aes(x = flipper_length_mm,
+           y = bill_length_mm)) +
+  geom_point(aes(color = species)) +
+  geom_smooth(color = "black") +
+  facet_grid(island ~ species)
+```
+
+### Positioning
+
+I notice that there are differences in how the species of penguins inhabit the different islands. I'm curious to know the actual values of the differences, though. We can use `geom_bar` to answer this question.
+
+```{r}
+ggplot(data = penguins,
+       aes(x = species,
+           fill = island)) +
+  geom_bar()
+```
+
+I can now readily see the approximate counts of each species by the island that they inhabit. You'll notice the behavior of `geom_bar`. Given no other prompting, it stacked the bar chart. In fact, this gives a hint towards one other key piece of `ggplot2`: positioning.
+
+Positioning, like statistics, also happens behind the scenes of a geometry most of the time. We have it within our power to manipulate these values, though. Recall the arguments for `geom_bar`:
+
+    geom_bar(
+      mapping = NULL,
+      data = NULL,
+      stat = "count",
+      position = "stack",
+      ...,
+      width = NULL,
+      na.rm = FALSE,
+      orientation = NA,
+      show.legend = NA,
+      inherit.aes = TRUE
+    )
+
+Specifically, notice that `position = "stack"`. We can adjust this.
+
+```{r}
+ggplot(data = penguins,
+       aes(x = species,
+           fill = island)) +
+  geom_bar(position = "dodge")
+```
+
+While not particularly attractive, this graph is actually more legible for our purposes. For example, I can very easily compare the size of the populations of penguin species by island.
+
+### Common errors
+
+When working with `ggplot2` there are several common errors that you may run into.
+
+Perhaps the most common...forgetting the `+` between different steps of your `ggplot2` object.
+
+```{r}
+ggplot(data = penguins,
+       aes(x = bill_length_mm,
+           y = flipper_length_mm))
+  geom_point()
+```
+
+More subtle, by a common issue that people new to `ggplot2` make, is to mess up when you are mapping aesthetics versus setting aesthetics.
+
+What is happening here?
+
+```{r}
+ggplot(data = penguins,
+       aes(x = bill_length_mm,
+           y = flipper_length_mm,
+           color = "blue")) +
+  geom_point()
+```
+
+What is happening here?
+
+```{r}
+ggplot(data = penguins,
+       aes(x = bill_length_mm,
+           y = flipper_length_mm)) +
+  geom_point(color = species)
+```
+
+# Git workflow
+
+## remote vs local
+
+## git clone
+
+## git add / commit / push workflow
