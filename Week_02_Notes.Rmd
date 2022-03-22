@@ -1,0 +1,262 @@
+---
+title: "Week 02 Notes"
+author: "Ryan Harrington"
+date: "3/21/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# install.packages("tidyverse")
+# install.packages("ggplot2")
+# install.packages("palmerpenguins")
+
+library(ggplot2)
+library(tidyverse)
+library(palmerpenguins)
+```
+
+
+```{r}
+data("penguins")
+```
+
+# Exploring data
+
+```{r}
+penguins
+```
+
+```{r}
+str(penguins)
+```
+
+```{r}
+summary(penguins)
+```
+
+```{r}
+penguins$species
+```
+
+```{r}
+# First row, row column
+penguins[1,1]
+
+# First row
+penguins[1,]
+
+# First column
+penguins[,1]
+```
+
+```{r}
+penguins$species
+penguins[,1]
+```
+
+```{r}
+# Take the first ten rows
+penguins[1:10,]
+
+# Take the 1st, 3rd, 5th, and 7th rows
+penguins[c(1, 3, 5, 7),]
+
+# Take all of the rows from 2 to 68 including every 2nd row
+penguins[seq(from = 2, to = 68, by = 2),]
+```
+
+```{r, eval=FALSE}
+nrow(penguins)
+
+ncol(penguins)
+
+dim(penguins)
+```
+
+```{r}
+# Take all of the rows from 2 to 68 including every 2nd row
+penguins[seq(from = 2, to = nrow(penguins), by = 2),]
+```
+
+```{r}
+unique(penguins$species)
+```
+
+```{r}
+length(unique(penguins$species))
+```
+
+```{r}
+View(penguins[1:16,])
+```
+
+```{r}
+head(penguins, n = 25)
+tail(penguins)
+```
+
+# Graphing
+
+```{r}
+ggplot(data = penguins,
+       aes(x = bill_depth_mm,
+           y = bill_length_mm)) +
+  geom_point()
+```
+
+```{r}
+ggplot(data = penguins,
+       aes(x = bill_depth_mm,
+           y = bill_length_mm,
+           color = species)) +
+  geom_point()
+```
+
+
+Flipper length vs bill length
+
+```{r}
+str(penguins)
+```
+
+flipper_length_mm
+bill_length_mm
+
+```{r}
+ggplot(data = penguins,
+       aes(x = flipper_length_mm,
+           y = bill_length_mm)) +
+  geom_point()
+```
+
+```{r}
+ggplot(data = penguins,
+       aes(x = flipper_length_mm,
+           y = bill_length_mm,
+           color = species)) +
+  geom_point()
+```
+
+```{r}
+cr_red <- "#e83536"
+
+ggplot(data = penguins,
+       aes(x = flipper_length_mm,
+           y = bill_length_mm)) +
+  geom_point(color = cr_red)
+```
+
+```{r, eval=FALSE}
+# species <- "blue"
+
+ggplot(data = penguins,
+       aes(x = flipper_length_mm,
+           y = bill_length_mm)) +
+  geom_point(color = species)
+```
+
+
+```{r}
+ggplot(data = penguins,
+       aes(x = flipper_length_mm,
+           y = bill_length_mm)) +
+  geom_smooth() +
+  geom_point()
+```
+```{r}
+ggplot(data = penguins,
+       aes(x = flipper_length_mm,
+           y = bill_length_mm,
+           color = species)) +
+  geom_smooth() +
+  geom_point()
+```
+
+```{r}
+ggplot(data = penguins,
+       aes(x = flipper_length_mm,
+           y = bill_length_mm)) +
+  geom_point(aes(color = species)) +
+  geom_smooth()
+```
+
+```{r}
+ggplot(data = penguins,
+       aes(x = flipper_length_mm,
+           y = bill_length_mm)) +
+  geom_point(aes(color = species)) +
+  geom_smooth(aes(group = species))
+```
+
+
+```{r}
+ggplot(data = penguins,
+       aes(x = bill_length_mm)) +
+  geom_histogram()
+```
+
+```{r}
+ggplot(data = penguins,
+       aes(x = island)) +
+  geom_bar()
+```
+
+
+```{r}
+ggplot(data = penguins,
+       aes(x = flipper_length_mm,
+           y = bill_length_mm)) +
+  geom_point() +
+  facet_grid(~ species)
+```
+
+```{r}
+ggplot(data = penguins,
+       aes(x = flipper_length_mm,
+           y = bill_length_mm)) +
+  geom_point() +
+  facet_grid(species ~ .)
+```
+
+```{r}
+ggplot(data = penguins,
+       aes(x = flipper_length_mm,
+           y = bill_length_mm)) +
+  geom_point() +
+  facet_grid(island ~ species)
+```
+
+```{r}
+ggplot(data = penguins,
+       aes(x = flipper_length_mm,
+           y = bill_length_mm)) +
+  geom_point(aes(color = species)) +
+  geom_smooth() +
+  facet_grid(island ~ species)
+```
+
+```{r}
+ggplot(data = penguins,
+       aes(x = species,
+           fill = island)) +
+  geom_bar()
+```
+
+```{r}
+ggplot(data = penguins,
+       aes(x = species,
+           fill = island)) +
+  geom_bar(position = "dodge")
+```
+
+```{r}
+ggplot(data = penguins,
+       aes(x = species,
+           fill = island))  +
+  geom_bar() +
+  labs(x = "example x axis title")
+```
